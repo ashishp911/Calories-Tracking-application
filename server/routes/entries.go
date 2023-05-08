@@ -3,6 +3,8 @@ package routes
 import (
 	"context"
 	"fmt"
+	"go-react-calorie-tracker/models"
+	"log"
 	"net/http"
 	"time"
 
@@ -19,7 +21,31 @@ The c *gin.Context is used to get id from params and also skips the need for (ht
 var entryCollection *mongo.Collection = OpenCollection(Client, "calories")
 
 func AddEntry(c *gin.Context) {
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	var entry models.Entry
+	// Converting JSON to struct understandable
+	if err := c.BindJSON(&entry); err != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+	validationErr := validate.Struct(entry)
+	if validationErr != nil{
+		c.JSON(http.StatusInternalServerError, gin.H{"error": validationErr.Error()})
+		fmt.Println(validationErr)
+		return 
+	}
 
+	entry.ID = primitive.NewObjectID()
+	result, insertErr := entryCollection.InsertOne(ctx, entry)
+	if insertErr != nil {
+		msg := fmt.Sprintf("order item was not created")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+		fmt.Println(insertErr)
+		return 
+	}
+	defer cancel()
+	c.JSON(http.StatusOK, result)	
 }
 
 func GetEntries(c *gin.Context) {
@@ -44,7 +70,7 @@ func GetEntries(c *gin.Context) {
 func GetEntryById(c *gin.Context) {
 	entryId := c.Params.ByName("id")
 	docID, _ := primitive.ObjectIDFromHex(entryId)
-	var ctx, cancel =context.WithTimeout(context.Background(), 100*time.Second)
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var entry bson.M
 	if err := entryCollection.FindOne(ctx, bson.M{"_id":docID}).Decode(&entry); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -61,7 +87,7 @@ func GetEntriesByIngredients(c *gin.Context) {
 }
 
 func UpdateEntry(c *gin.Context) {
-
+	
 }
 
 func UpdateIngredient(c *gin.Context) {
