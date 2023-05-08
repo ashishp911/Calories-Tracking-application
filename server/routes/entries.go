@@ -10,13 +10,14 @@ func GetEntries(c *gin.Context) {
 
 }
 
+func GetEntryById(c *gin.Context){
+
+}
+
 func GetEntriesByIngredients(c *gin.Context){
 
 }
 
-func GetEntry(c *gin.Context){
-
-}
 
 func UpdateEntry(c *gin.Context) {
 
