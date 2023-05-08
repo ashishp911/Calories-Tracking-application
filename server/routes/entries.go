@@ -16,7 +16,7 @@ import (
 The c *gin.Context is used to get id from params and also skips the need for (http.ResponseWriter, r *http.Request)
 */
 
-var entryCollection *mongo.Collection = openCollection(Client, "calories")
+var entryCollection *mongo.Collection = OpenCollection(Client, "calories")
 
 func AddEntry(c *gin.Context) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
