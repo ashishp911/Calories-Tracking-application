@@ -9,5 +9,5 @@ type Entry struct {
 	Dish        *string            `json:"dish"`
 	Fat         *float64           `json:"fat"`
 	Ingredients *string            `json:"ingredients"`
-	Calories    *float64           `json:"calories"`
+	Calories    *string           `json:"calories"`
 }
