@@ -19,6 +19,10 @@ The c *gin.Context is used to get id from params and also skips the need for (ht
 var entryCollection *mongo.Collection = OpenCollection(Client, "calories")
 
 func AddEntry(c *gin.Context) {
+
+}
+
+func GetEntries(c *gin.Context) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var entries []bson.M
 	cursor, err := entryCollection.Find(ctx, bson.M{}) 
@@ -34,15 +38,22 @@ func AddEntry(c *gin.Context) {
 	}	
 	defer cancel()
 	fmt.Println(entries)
-	c.JSON(http.StatusOK, entries)
-}
-
-func GetEntries(c *gin.Context) {
-
+	c.JSON(http.StatusOK, entries)	
 }
 
 func GetEntryById(c *gin.Context) {
-
+	entryId := c.Params.ByName("id")
+	docID, _ := primitive.ObjectIDFromHex(entryId)
+	var ctx, cancel =context.WithTimeout(context.Background(), 100*time.Second)
+	var entry bson.M
+	if err := entryCollection.FindOne(ctx, bson.M{"_id":docID}).Decode(&entry); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println(err)
+		return
+	}
+	defer cancel()
+	fmt.Println(entry)
+	c.JSON(http.StatusOK, entry)
 }
 
 func GetEntriesByIngredients(c *gin.Context) {
