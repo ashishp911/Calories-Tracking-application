@@ -1,10 +1,11 @@
 package main
 
 import (
-	"os"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
+	"fmt"
 	"go-react-calorie-tracker/routes"
+	"os"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main(){
@@ -25,6 +26,6 @@ func main(){
 	router.PUT("/entry/update/:id", routes.UpdateEntry)
 	router.PUT("/ingredients/update/:id", routes.UpdateIngredient)
 	router.DELETE("/entry/delete/:id", routes.DeleteEntry)
-
 	router.Run(":" + port)
+	fmt.Println("Server is running on port 8000......")
 }
